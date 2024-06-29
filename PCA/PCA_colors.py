@@ -1,16 +1,19 @@
 import sys
-sys.path.insert(0, "../../../")
+sys.path.insert(0, "../../../BIRCH")
 from isim.isim_birch import Birch
-from isim.isim_comp import calculate_isim
+from isim.isim_comp import calculate_isim, calculate_medoid
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from adjustText import adjust_text
+from rdkit import Chem
+from rdkit.Chem import Draw
 
 # Read the fingerprints
 fps = np.load('../../../BIRCH/data/chembl_33_np.npy', mmap_mode='r')
-print(fps.shape)
+smiles = np.loadtxt('../../../BIRCH/data/chembl_33_np.csv', delimiter=',', usecols=1, dtype=str)
+print(fps.shape, len(smiles))
 
 # Create 5 white spaces for subplots
 fig, axs = plt.subplots(2, 2, figsize=(10, 8))  # 2x2 grid of subplots, resulting in a 2D array
@@ -27,8 +30,9 @@ for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
 
     # Get the centroids fingerprints
     centroids = brc.get_centroids()
-
-    # Fit the centroids to PCA
+    
+    # get closest structure to centroid with isim
+    
     pca = PCA(n_components=2)
     pca.fit(centroids)
 
@@ -47,12 +51,18 @@ for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
 
     # Get color labels
     color_labels = []
+    medoid_smiles = []
     for j, cluster in enumerate(clusters):
         if big_clusters[j]:
             fps_cluster = fps[cluster]
             isim = calculate_isim(fps_cluster, n_ary='JT')
             color_labels.append(isim)
-
+            medoid = calculate_medoid(fps_cluster, n_ary='JT')
+            medoid_smiles.append(smiles[medoid])
+    # visualize the smiles
+    mols = [Chem.MolFromSmiles(s) for s in medoid_smiles]
+    img = Draw.MolsToGridImage(mols, molsPerRow=5, subImgSize=(200, 200))
+    img.save(f'cluster_{i}.png')
     # Plot the PCA components, make each point size proportional to the number of elements in the cluster
     if i == 0:  
         ax = axs[0, 0]
@@ -98,6 +108,8 @@ for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
         text = ax.text(pca_n.iloc[k, 0], pca_n.iloc[k, 1], 
                              str(num_elements[k]), fontsize=11, ha='center', fontweight='bold',
                              va='center', c='black')
+        # annotate the smiles images
+        
         texts.append(text)
     # Use adjust_text to automatically adjust the text positions
     adjust_text(texts, ax=ax)
