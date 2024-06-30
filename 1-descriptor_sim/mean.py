@@ -18,7 +18,6 @@ for but_brc_file in but_brc_files:
         os.makedirs(f'descriptor_sim/{base_name}')
     
     data = pd.read_csv(but_brc_file)
-
     for idx, descriptor in enumerate(descriptors):
         if idx == 0:
             cols = [4, 5]
