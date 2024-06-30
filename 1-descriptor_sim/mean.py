@@ -68,8 +68,8 @@ for but_brc_file in but_brc_files:
         if idx == 0:
             # x_data is all the keys
             x_data = np.array(list(keys))
-            y_data = np.array(mean_values_but) 
-            y1_data = np.array(mean_values_brc) 
+            y_data = np.array(mean_values_but) + np.array(std_values_but)
+            y1_data = np.array(mean_values_brc) + np.array(std_values_brc)
             filtered_y_data = y_data[(x_data >= 0.3) & (x_data <= 0.8)]
             filtered_y1_data = y1_data[(x_data >= 0.3) & (x_data <= 0.8)]
             
@@ -82,7 +82,7 @@ for but_brc_file in but_brc_files:
                 min_y = min(filtered_y_data)
             else:
                 min_y = min(filtered_y1_data)
-            ax.set_ylim(min_y - 50, max_y + (0.2 * max_y))
+            ax.set_ylim(min_y - 100, max_y + (0.2 * max_y))
         
         ax.tick_params(axis='both', which='major', length=8, width=2)
         ax.legend(fontsize=14, frameon=False)
