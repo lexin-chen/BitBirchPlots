@@ -60,12 +60,14 @@ for but_brc_file in but_brc_files:
                 
                 # figure which y_data is the largest
                 if max(filtered_y_data) > max(filtered_y1_data):
-                    ax[i].set_ylim(min(filtered_y_data) - 100, max(filtered_y_data) + 100)
+                    max_y = max(filtered_y_data)
                 else:
-                    ax[i].set_ylim(min(filtered_y1_data) - 100, max(filtered_y1_data) + 100)
+                    max_y = max(filtered_y1_data)
                 if min(filtered_y_data) < min(filtered_y1_data):
-                    ax[i].set_ylim(min(filtered_y_data) - 100, max(filtered_y1_data) + 100)
-                
+                    min_y = min(filtered_y_data)
+                else:
+                    min_y = min(filtered_y1_data)
+                ax[i].set_ylim(min_y - 100, max_y + (0.2 * max_y))
             ax[i].tick_params(axis='both', which='major', length=8, width=2)  # Adjust for major ticks
             for axis in ['top', 'bottom', 'left', 'right']:
                 ax[i].spines[axis].set_linewidth(2)
@@ -75,3 +77,4 @@ for but_brc_file in but_brc_files:
         # one y axis label
         fig.text(0.01, 0.5, descriptor, va='center', rotation='vertical', fontsize=24, fontweight='bold')
         plt.savefig(f'descriptor_sim/{base_name}/{descriptor}.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
+        plt.close()
