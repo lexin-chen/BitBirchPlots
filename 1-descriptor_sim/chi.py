@@ -1,5 +1,7 @@
 import re
 import numpy as np
+import glob
+import os
 
 def process_line(line):
     # Split the line by commas and take up to the first 10 elements
@@ -14,51 +16,68 @@ def process_line(line):
             pass
     return float_elements
 
-results = []
-with open('../../but_brc_metrics/CHEMBL204_Ki_fp_but_brc.csv', 'r') as file:
-    for line in file:
-        # Check if the line starts with a digit, negative sign, or quotation mark
-        
-        if re.match(r'^[\d"-]', line.strip()):
-            # check if it doesn't start with a space
-            if not line.startswith(' '):
-                processed_line = process_line(line.strip())
-                results.append(processed_line)
+but_brc_files = glob.glob('../../but_brc_metrics/*.csv')
+print(but_brc_files)
+for but_brc_file in but_brc_files:
+    base_name = os.path.basename(but_brc_file)
+    base_name = base_name.split('\\')[-1].split('.csv')[0]
+    if not os.path.exists(base_name):
+        os.makedirs(base_name)
+    results = []
+    with open(but_brc_file, 'r') as file:
+        for line in file:
+            # Check if the line starts with a digit, negative sign, or quotation mark
+            
+            if re.match(r'^[\d"-]', line.strip()):
+                # check if it doesn't start with a space
+                if not line.startswith(' '):
+                    processed_line = process_line(line.strip())
+                    results.append(processed_line)
+    results = np.array(results)
 
-# At this point, `results` contains the processed lines with up to the first 10 elements from each line.
-# Further processing or conversion to the desired format can be done as needed.
+    unique_values = np.unique(results[:, 1])
 
-results = np.array(results)
+    n_unique_values = len(unique_values)
+    dict_values = {}
+    for i, each in enumerate(unique_values):
+        dict_values[each] = []
+        # append the whole row to the dictionary if each match with the unique value
+        for j, row in enumerate(results):
+            if row[1] == each:
+                dict_values[each].append(row)
+                
+        dict_values[each] = np.array(dict_values[each])
 
-# read the column 2 and separate result based on the value
-# find number of unique values in column 2
-unique_values = np.unique(results[:, 1])
+    descriptors = ['Calinski-Harabasz Index', 'Davies-Bouldin Index', 'Dunn Index']
+    for idx, descriptor in enumerate(descriptors):
+        if idx == 0:
+            cols = [4, 5]
+        elif idx == 1:
+            cols = [6, 7]
+        elif idx == 2:
+            cols = [8, 9]
+        import matplotlib.pyplot as plt
+        plt.rcParams.update({'font.size': 14, 'font.weight': 'bold'})
 
-n_unique_values = len(unique_values)
-dict_values = {}
-for i, each in enumerate(unique_values):
-    dict_values[each] = []
-    # append the whole row to the dictionary if each match with the unique value
-    for j, row in enumerate(results):
-        if row[1] == each:
-            dict_values[each].append(row)
+        fig, ax = plt.subplots(5, 1, figsize=(10, 20))
 
-# if column 5 or 6 is 0, delete the row
-#results = results[results[:, 4] != 0]
-# graph 5 and 6
-import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 12, 'font.weight': 'bold'})
-# create subplots
-fig, ax = plt.subplots(5, 1, figsize=(10, 20))
-
-for i in range(5):
-    ax[i].plot(results[:, 0], results[:, 4], label='Taylor-Butina')
-    ax[i].plot(results[:, 0], results[:, 5], label='Birch')
-    
-    ax[i].set_title(f'Min size: {unique_values[i]}', fontsize=12, fontweight='bold')
-# create a legend
-ax[0].legend()
-fig.text(0.5, 0.04, 'Similarity Threshold', ha='center', fontsize=12, fontweight='bold')
-# one y axis label
-fig.text(0.04, 0.5, 'Calinski-Harabasz Index', va='center', rotation='vertical', fontsize=12, fontweight='bold')
-plt.savefig('similarity.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
+        for i in range(5):
+            ax[i].plot(dict_values[unique_values[i]][:, 0], dict_values[unique_values[i]][:, cols[0]], 
+                    label='Taylor-Butina', linewidth=8, linestyle='--', c='#005cde')
+            ax[i].plot(dict_values[unique_values[i]][:, 0], dict_values[unique_values[i]][:, cols[1]], 
+                    label='BitBirch', linewidth=8, c='#f99200', alpha=0.8)
+            
+            ax[i].set_title(f'Min size: {int(unique_values[i])}', fontsize=14, fontweight='bold')
+            ax[i].set_xlim(0.3, 0.8)
+            if i != 4:
+                ax[i].xaxis.set_tick_params(labelbottom=False)
+                ax[i].set_xticklabels(ax[i].get_xticks())
+            ax[i].tick_params(axis='both', which='major', length=8, width=2)  # Adjust for major ticks
+            for axis in ['top', 'bottom', 'left', 'right']:
+                ax[i].spines[axis].set_linewidth(2)
+        # create a legend
+        ax[0].legend(fontsize=14)
+        fig.text(0.5, 0.07, 'Similarity Threshold', ha='center', fontsize=20, fontweight='bold')
+        # one y axis label
+        fig.text(0.01, 0.5, descriptor, va='center', rotation='vertical', fontsize=20, fontweight='bold')
+        plt.savefig(f'{base_name}/{descriptor}.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
