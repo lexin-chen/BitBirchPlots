@@ -131,4 +131,4 @@ for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
     ax.set_xticklabels(ax.get_xticks(), fontweight=fontweight, fontsize=font_size)
     ax.set_yticklabels(ax.get_yticks(), fontweight=fontweight, fontsize=font_size)
     
-plt.savefig('PCA_colors_test.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
+plt.savefig('PCA_colors.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
