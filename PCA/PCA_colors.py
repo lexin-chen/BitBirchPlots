@@ -9,6 +9,7 @@ from sklearn.decomposition import PCA
 from adjustText import adjust_text
 from rdkit import Chem
 from rdkit.Chem import Draw
+import matplotlib
 
 # Read the fingerprints
 fps = np.load('../../../BIRCH/data/chembl_33_np.npy', mmap_mode='r')
@@ -22,6 +23,14 @@ plt.rcParams['font.size'] = 12
 plt.rcParams['font.weight'] = 'bold'
 font_size = 12
 fontweight = 'bold'
+
+min_val, max_val = 0.03,0.9
+n = 100
+cmap = plt.cm.gnuplot2
+cmap_reversed = cmap.reversed()
+# reverse the colors
+colors = cmap_reversed(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
 
 for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
     # Fit the Birch model
@@ -89,8 +98,9 @@ for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
     
     # Add a colorbar only to the last plot
 
-    scatter = ax.scatter(pca['PCA1'], pca['PCA2'], c=color_labels, cmap='rainbow', 
+    scatter = ax.scatter(pca['PCA1'], pca['PCA2'], c=color_labels, cmap=cmap, 
                          alpha=0.7, s=num_elements * 0.35, edgecolors='black', linewidth=0.1)
+
     if i == 3:
         # adjust
         fig.subplots_adjust(right=0.8)
@@ -121,4 +131,4 @@ for i, t in enumerate([0.35, 0.5, 0.65, 0.8]):
     ax.set_xticklabels(ax.get_xticks(), fontweight=fontweight, fontsize=font_size)
     ax.set_yticklabels(ax.get_yticks(), fontweight=fontweight, fontsize=font_size)
     
-plt.savefig('PCA_colors.png', dpi=500, bbox_inches='tight', pad_inches=0.1)
+plt.savefig('PCA_colors_test.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)

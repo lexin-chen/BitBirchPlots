@@ -4,11 +4,18 @@ import glob
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+import matplotlib
 
 but_brc_files = glob.glob('../../but_brc_metrics/*.csv')
 matrix_types = ['medoid_matrix', 'set_matrix']
 plt.rcParams.update({'font.size': 16, 'font.weight': 'bold'})
+
+min_val, max_val = 0.2, 1.0
+n = 10
+orig_cmap = plt.cm.get_cmap('gnuplot2')
+colors = orig_cmap(np.linspace(min_val, max_val, n))
+cmap = matplotlib.colors.LinearSegmentedColormap.from_list("mycmap", colors)
+
 for but_brc_file in but_brc_files:
     base_name = os.path.basename(but_brc_file)
     
