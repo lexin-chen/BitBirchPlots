@@ -5,17 +5,17 @@ import os
 import matplotlib.pyplot as plt
 
 but_brc_files = glob.glob('../../but_brc_metrics/*.csv')
-descriptors = ['Calinski-Harabasz Index', 'Davies-Bouldin Index', 'Dunn Index']
+descriptors = ['Calinski-Harabasz Index', 'Davies-Bouldin Index', 'Dunn Index', 'Number of Clusters']
 
-if not os.path.exists('descriptor_sim'):
-    os.makedirs('descriptor_sim')
+if not os.path.exists('../../descriptor_sim'):
+    os.makedirs('../../descriptor_sim')
 plt.rcParams.update({'font.size': 16, 'font.weight': 'bold'})
 
 for but_brc_file in but_brc_files:
     base_name = os.path.basename(but_brc_file)
     base_name = base_name.split('\\')[-1].split('.csv')[0]
-    if not os.path.exists(f'descriptor_sim/{base_name}'):
-        os.makedirs(f'descriptor_sim/{base_name}')
+    if not os.path.exists(f'../../descriptor_sim/{base_name}'):
+        os.makedirs(f'../../descriptor_sim/{base_name}')
     
     data = pd.read_csv(but_brc_file)
     # unique values are in the second column
@@ -37,7 +37,8 @@ for but_brc_file in but_brc_files:
             cols = [6, 7]
         elif idx == 2:
             cols = [8, 9]
-
+        elif idx == 3:
+            cols = [2, 3]
         fig, ax = plt.subplots(5, 1, figsize=(10, 20))
         for i in range(5):
             ax[i].plot(dict_values[unique_values[i]][:, 0], dict_values[unique_values[i]][:, cols[0]], 
@@ -76,5 +77,5 @@ for but_brc_file in but_brc_files:
         fig.text(0.5, 0.07, 'Similarity Threshold', ha='center', fontsize=24, fontweight='bold')
         # one y axis label
         fig.text(0.01, 0.5, descriptor, va='center', rotation='vertical', fontsize=24, fontweight='bold')
-        plt.savefig(f'descriptor_sim/{base_name}/{descriptor}.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
+        plt.savefig(f'../../descriptor_sim/{base_name}/{descriptor}.png', dpi=500, bbox_inches='tight', pad_inches=0.1, transparent=True)
         plt.close()
