@@ -13,7 +13,7 @@ but_times = np.loadtxt('../../data/pubchem_but_time_1.csv', delimiter=',', skipr
 plt.plot(but_times[:, 0], but_times[:, 1], label='Taylor-Butina', linewidth=2, linestyle='--',
          c='#005cde')
 plt.plot(brc_times[:, 0], brc_times[:, 1], label='BitBirch', linewidth=2, c='#f99200')
-plt.xlabel(f'Number of molecules ($\\times 10^5$)', fontsize=14, fontweight='bold')
+plt.xlabel(f'Number of molecules (/ $10^5$)', fontsize=14, fontweight='bold')
 plt.ylabel('Time (s)', fontsize=14, fontweight='bold')
 # Apply the formatter
 plt.gca().xaxis.set_major_formatter(FuncFormatter(millions_formatter))
