@@ -1,0 +1,2 @@
+/tmp/slurmd/job39792723/slurm_script: line 16: 472018 Killed                  python distance.py
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=39792723.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.
