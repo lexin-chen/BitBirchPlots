@@ -29,4 +29,4 @@ for (i, j, weight) in G.edges(data='weight'):
 # Draw node labels
 nx.draw_networkx_labels(G, pos, font_size=12, font_color='black')
 plt.title('Network with Edges Varying in Opacity Based on Distance')
-plt.savefig('network.png', dpi=500, bbox_inches='tight', pad_inches=0.1)
+plt.savefig('dis_network.png', dpi=500, bbox_inches='tight', pad_inches=0.1)

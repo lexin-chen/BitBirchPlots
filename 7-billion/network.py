@@ -1,29 +1,32 @@
-import pickle
-import networkx as nx
+import numpy as np
 import matplotlib.pyplot as plt
-import numpy  as np
-import nx_pylabs
-import glob
+import networkx as nx
+# Example distance matrix
 
-files = glob.glob('*.pkl')
-for file in files:
-    with open(file, 'rb') as f:
-        data = pickle.load(f)
-    for index in ['JT']:
-        for c_threshold in [-1, 10, 20, 30, 40, 50, 60, 70, 80, 90]:
-            for edge_threshold in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-                try:
-                    matrix = data[index][c_threshold]
-                    matrix[matrix <= edge_threshold] = 0
-                    g=nx.convert_matrix.from_numpy_matrix(matrix)
-                    alpha = np.array([g[u][v]['weight'] for u,v in g.edges()])
-                    #alpha -= np.min(alpha)
-                    alpha /= np.max(alpha)
-                    fig, ax = plt.subplots(1, 1, sharex=True)
-                    x = nx_pylabs.draw_networkx(g, with_labels=True, edge_color=alpha, edge_cmap=plt.cm.Blues, pos=nx.drawing.layout.spring_layout(g, weight='weight', iterations=400, k=1/len(g)), ax=ax)
-                    #plt.show()
-                    name = file.split('_')[0]
-                    name += '_' + index + '_c' + str(c_threshold) + '_e' + str(edge_threshold)
-                    plt.savefig(name + '.png')
-                except ValueError:
-                    break
+distance_matrix = np.load('../../data/distances_billion_parallel.npy')[::100]
+# Example coordinates of points
+# random 10000 points
+points = np.load('../../data/pca_matrix_billion_parallel.npy')[::100]
+# Create a graph
+G = nx.Graph()
+# Add nodes with positions
+for i, (x, y) in enumerate(points):
+    G.add_node(i, pos=(x, y))
+# Add edges with weights from the distance matrix
+for i in range(len(distance_matrix)):
+    for j in range(i + 1, len(distance_matrix)):
+        distance = distance_matrix[i, j]
+        if distance > 0:  # Add edge only if there is a non-zero distance
+            G.add_edge(i, j, weight=distance)
+# Get positions of nodes for plotting
+pos = nx.get_node_attributes(G, 'pos')
+# Draw the nodes
+nx.draw_networkx_nodes(G, pos, node_size=300)
+# Draw the edges with varying opacity
+for (i, j, weight) in G.edges(data='weight'):
+    opacity = 1 / (1 + weight)  # Example function for opacity
+    nx.draw_networkx_edges(G, pos, edgelist=[(i, j)], alpha=opacity, width=2)
+# Draw node labels
+nx.draw_networkx_labels(G, pos, font_size=12, font_color='black')
+plt.title('Network with Edges Varying in Opacity Based on Distance')
+plt.savefig('network.png', dpi=500, bbox_inches='tight', pad_inches=0.1)

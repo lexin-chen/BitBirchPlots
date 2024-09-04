@@ -1,2 +1,4 @@
-/tmp/slurmd/job39792723/slurm_script: line 16: 472018 Killed                  python distance.py
-slurmstepd: error: Detected 1 oom-kill event(s) in StepId=39792723.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.
+/blue/rmirandaquintana/le.chen/comparisons/clustering/alignedClustering/birch/analysis/7-billion/pca.py:86: UserWarning: FixedFormatter should only be used together with FixedLocator
+  ax.set_xticklabels(ax.get_xticks(), fontweight=fontweight, fontsize=font_size)
+/blue/rmirandaquintana/le.chen/comparisons/clustering/alignedClustering/birch/analysis/7-billion/pca.py:87: UserWarning: FixedFormatter should only be used together with FixedLocator
+  ax.set_yticklabels(ax.get_yticks(), fontweight=fontweight, fontsize=font_size)
